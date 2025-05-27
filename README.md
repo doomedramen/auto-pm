@@ -1,6 +1,6 @@
-# @doomedramen/auto (Auto-PM)
+# @doomedramen/auto
 
-`@doomedramen/auto` (formerly Auto-PM) is a CLI tool that automatically detects the package manager (npm, yarn, pnpm, bun, deno) in your project and runs commands accordingly. This allows you to use a consistent command (`auto`) across different projects without worrying about which package manager is in use.
+`@doomedramen/auto` is a CLI tool that automatically detects the package manager (npm, yarn, pnpm, bun, deno) in your project and runs commands accordingly. This allows you to use a consistent command (`auto`) across different projects without worrying about which package manager is in use.
 
 ## Features
 
