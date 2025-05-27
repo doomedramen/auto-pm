@@ -1,2 +1,33 @@
-!dist/
+# Ignore everything by default
+*
+.*
+
+# Whitelist essential files and directories
+
+# package.json is always included by npm, but being explicit can be clear
+!package.json
+
+# Include README and LICENSE
+!README.md
+!LICENSE
+
+# Include the bin directory and its contents
 !bin/
+!bin/**
+
+# Include the dist directory (compiled code) and its contents
+!dist/
+!dist/**
+
+# Ensure common unwanted files/directories are definitely ignored
+# (though '*' and '.*' should cover most of these)
+node_modules/
+src/
+tsconfig.json
+jest.config.js
+eslint.config.cjs
+.github/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
