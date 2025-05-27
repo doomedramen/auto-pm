@@ -1,6 +1,6 @@
-# Auto-PM
+# @doomedramen/auto (Auto-PM)
 
-Auto-PM is a CLI tool that automatically detects the package manager (npm, yarn, pnpm, bun, deno) in your project and runs commands accordingly. This allows you to use a consistent command (`auto`) across different projects without worrying about which package manager is in use.
+`@doomedramen/auto` (formerly Auto-PM) is a CLI tool that automatically detects the package manager (npm, yarn, pnpm, bun, deno) in your project and runs commands accordingly. This allows you to use a consistent command (`auto`) across different projects without worrying about which package manager is in use.
 
 ## Features
 
@@ -12,18 +12,18 @@ Auto-PM is a CLI tool that automatically detects the package manager (npm, yarn,
 
 ### Global Installation (Recommended)
 
-Install `auto-pm` globally to use the `auto` command in any project:
+Install `@doomedramen/auto` globally to use the `auto` command in any project:
 
 ```bash
-npm install -g auto-pm
+npm install -g @doomedramen/auto
 ```
 
 ### Local Installation
 
-You can also install `auto-pm` as a dev dependency in a specific project:
+You can also install `@doomedramen/auto` as a dev dependency in a specific project:
 
 ```bash
-npm install --save-dev auto-pm
+npm install --save-dev @doomedramen/auto
 ```
 
 Then you can run it via `npx auto ...` or by adding it to your `package.json` scripts.
@@ -59,7 +59,7 @@ auto run build --watch
 
 ## How it Works
 
-`auto-pm` detects the package manager by looking for specific lock files or configuration files in the current directory and its parent directories:
+`@doomedramen/auto` detects the package manager by looking for specific lock files or configuration files in the current directory and its parent directories:
 
 - `yarn.lock` for Yarn
 - `package-lock.json` for npm
