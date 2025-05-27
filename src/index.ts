@@ -2,7 +2,7 @@ import { execSync } from "child_process";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 
-function detectPackageManager(): {
+export function detectPackageManager(): {
   packageManager: string;
   projectRoot: string;
 } {
@@ -21,26 +21,49 @@ function detectPackageManager(): {
       existsSync(join(currentDir, "bun.lock"))
     ) {
       return { packageManager: "bun", projectRoot: currentDir };
+    } else if (
+      existsSync(join(currentDir, "deno.json")) ||
+      existsSync(join(currentDir, "deno.jsonc"))
+    ) {
+      return { packageManager: "deno", projectRoot: currentDir };
     }
 
     const parentDir = join(currentDir, "..");
     if (parentDir === currentDir) {
+      // Reached the root of the filesystem
       break;
     }
     currentDir = parentDir;
   }
 
-  throw new Error("No supported package manager detected.");
+  throw new Error(
+    `No supported package manager detected. Searched up to: ${currentDir}`
+  );
 }
 
-function runCommand(command: string, subcommand: string, args: string[]) {
+export function runCommand(
+  command: string,
+  subcommand: string,
+  args: string[]
+) {
   const cmdArgs = subcommand ? [subcommand, ...args] : args;
   const fullCommand = `${command} ${cmdArgs.join(" ")}`;
+  console.log(`> ${fullCommand}`); // Log the command being run
 
   try {
     execSync(fullCommand, { stdio: "inherit" });
-  } catch (error) {
-    console.error(`Error: ${error}`);
+  } catch (error: any) {
+    let errorMessage = `Error executing command: ${fullCommand}\n`;
+    if (error.status) {
+      errorMessage += `Command failed with exit code ${error.status}\n`;
+    }
+    if (error.message) {
+      errorMessage += `Message: ${error.message}\n`;
+    }
+    if (error.stderr) {
+      errorMessage += `Stderr: ${error.stderr.toString()}\n`;
+    }
+    console.error(errorMessage);
     process.exit(1);
   }
 }
@@ -78,6 +101,15 @@ function main() {
       runCommand("pnpm", "dlx", args);
     } else if (packageManager === "bun") {
       runCommand("bun", "x", args);
+    } else if (packageManager === "deno") {
+      // For Deno, 'x' equivalent is typically 'deno run -A'
+      // The first arg in 'args' is the script/url, rest are its arguments
+      if (args.length > 0) {
+        runCommand("deno", "run", ["-A", ...args]);
+      } else {
+        console.error("Error: 'deno x' requires a script or URL to execute.");
+        process.exit(1);
+      }
     } else {
       console.error(
         `Error: 'x' command is not supported for package manager '${packageManager}'`
@@ -86,9 +118,20 @@ function main() {
     }
   } else {
     const packageJsonPath = join(projectRoot, "package.json");
-    const scripts = existsSync(packageJsonPath)
-      ? JSON.parse(readFileSync(packageJsonPath, "utf-8")).scripts || {}
-      : {};
+    let scripts: { [key: string]: string } = {}; // Define type for scripts object
+    if (existsSync(packageJsonPath)) {
+      try {
+        const packageJsonContent = readFileSync(packageJsonPath, "utf-8");
+        const packageJson = JSON.parse(packageJsonContent);
+        scripts = packageJson.scripts || {};
+      } catch (parseError: any) {
+        console.error(
+          `Error parsing package.json at ${packageJsonPath}: ${parseError.message}`
+        );
+        // Optionally, exit or proceed without scripts
+        // process.exit(1);
+      }
+    }
 
     if (scripts[command]) {
       runCommand(packageManager, "run", [command, ...args]);
@@ -98,4 +141,6 @@ function main() {
   }
 }
 
-main();
+if (require.main === module) {
+  main();
+}
